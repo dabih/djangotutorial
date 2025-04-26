@@ -13,8 +13,17 @@ BASE_DC += -f $(backend_docker_compose_path)
 BASE_DC += -f $(broker_docker_compose_path)
 BASE_DC += -f $(s3_docker_compose_path)
 BASE_DC += -f $(nginx_docker_compose_path)
-PYTHONPATH = ./backend
+PYTHONPATH = ./django
 
+ENV_FILE = .env
+ENV_EXAMPLE_FILE = .env.sample
+
+# Rule to check if .env exists
+check-env:
+	@if [ ! -f $(ENV_FILE) ]; then \
+		echo "$(ENV_FILE) does not exist. Using $(ENV_EXAMPLE_FILE) instead."; \
+		cp $(ENV_EXAMPLE_FILE) $(ENV_FILE); \
+	fi
 
 build-no-cache:
 	$(BASE_DC) build --no-cache
@@ -22,7 +31,7 @@ build-no-cache:
 build:
 	$(BASE_DC) build
 
-up:
+up: check-env
 	$(BASE_DC) up -d
 
 down:
