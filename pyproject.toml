@@ -49,6 +49,7 @@ dev = [
     "polyfactory>=2.19.0,<3",
     "pip-audit>=2.8.0,<3",
     "pytest-xdist>=3.6.1,<4",
+    "django-debug-toolbar>=5.2.0",
 ]
 
 [build-system]
