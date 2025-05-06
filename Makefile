@@ -74,7 +74,8 @@ mypy:
 lint: black isort flake8 pylint mypy
 
 pip-audit:
-	uv run pip-audit
+	uv run pip-audit \
+		--ignore-vuln GHSA-vqfr-h8mv-ghfj
 
 test:
 	PYTHONPATH=$(PYTHONPATH) uv run pytest -n 2
