@@ -320,9 +320,11 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "django" },
+    { name = "djangorestframework" },
     { name = "dotenv" },
     { name = "fastapi" },
     { name = "psycopg2-binary" },
+    { name = "pygments" },
     { name = "python-dotenv" },
     { name = "uvicorn" },
 ]
@@ -369,9 +371,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.2" },
+    { name = "djangorestframework", specifier = ">=3.16.0" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "fastapi", specifier = ">=0.115.11,<0.116" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
+    { name = "pygments", specifier = ">=2.19.1" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
     { name = "uvicorn", specifier = ">=0.34.0,<0.35" },
 ]
@@ -413,6 +417,18 @@ dev = [
     { name = "types-pytz", specifier = ">=2025.1.0.20250204,<2026" },
     { name = "types-requests", specifier = ">=2.32.0.20250306,<3" },
     { name = "typing-extensions", specifier = ">=4.12.2,<5" },
+]
+
+[[package]]
+name = "djangorestframework"
+version = "3.16.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/7d/97/112c5a72e6917949b6d8a18ad6c6e72c46da4290c8f36ee5f1c1dcbc9901/djangorestframework-3.16.0.tar.gz", hash = "sha256:f022ff46613584de994c0c6a4aebbace5fd700555fbe9d33b865ebf173eba6c9", size = 1068408 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/eb/3e/2448e93f4f87fc9a9f35e73e3c05669e0edd0c2526834686e949bb1fd303/djangorestframework-3.16.0-py3-none-any.whl", hash = "sha256:bea7e9f6b96a8584c5224bfb2e4348dfb3f8b5e34edbecb98da258e892089361", size = 1067305 },
 ]
 
 [[package]]
