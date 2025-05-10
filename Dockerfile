@@ -19,6 +19,7 @@ ENV UV_PROJECT_ENVIRONMENT="/usr/local/"
 # will be cached if no changes in this files
 COPY uv.lock .
 COPY pyproject.toml .
+COPY .env.sample .env
 
 COPY /scripts/start.sh /start.sh
 COPY /scripts/wait-for-it.sh /wait-for-it.sh
@@ -31,7 +32,7 @@ RUN chmod +x /start.sh \
     && mkdir /static \
     && chown -R backend:backend /static
 
-COPY backend .
+COPY django .
 
 # Establish the runtime user (with no password and no sudo)
 USER backend

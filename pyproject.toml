@@ -1,11 +1,15 @@
 [project]
-name = "py-app-template"
+name = "django-tutorial"
 version = "0.1.0"
-description = "So, you want to start a new Python project? This template is for you!"
-authors = [{ name = "soltanoff", email = "ilia@soltanov.dev" }]
+description = "Tutorial"
+authors = [{ name = "dignatov", email = "d@dign.ru" }]
 requires-python = "~=3.12"
 dependencies = [
+    "django>=5.2",
+    "dotenv>=0.9.9",
     "fastapi>=0.115.11,<0.116",
+    "psycopg2-binary>=2.9.10",
+    "python-dotenv>=1.1.0",
     "uvicorn>=0.34.0,<0.35",
 ]
 
@@ -45,6 +49,7 @@ dev = [
     "polyfactory>=2.19.0,<3",
     "pip-audit>=2.8.0,<3",
     "pytest-xdist>=3.6.1,<4",
+    "django-debug-toolbar>=5.2.0",
 ]
 
 [build-system]
