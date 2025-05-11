@@ -1,8 +1,9 @@
 from enum import Enum
-from typing import Annotated, Union
+from typing_extensions import Annotated, Literal, Union, Dict
 
-from fastapi import Body, FastAPI, Query
-from pydantic import BaseModel
+from fastapi import Body, FastAPI, Query, Cookie, Header
+from pydantic import BaseModel, Field, HttpUrl
+
 
 class ModelName(str, Enum):
     alexnet = "alexnet"
@@ -10,24 +11,107 @@ class ModelName(str, Enum):
     lenet = "lenet"
 
 
+class Image(BaseModel):
+    url: HttpUrl
+    name: str
+
+
 class Item(BaseModel):
+    name: str = Field(examples=["Foo"])
+    description: Union[str, None] = Field(
+        default=None, title="The description of the item", max_length=300,
+        examples=["A very nice Item"]
+    )
+    price: float = Field(gt=0, description="The price must be greater than zero", examples=[35.4])
+    tax: Union[float, None] = Field(default=None, examples=[3.2])
+    tags: set[str] = set()
+    images: Union[list[Image], None] = None
+
+    model_config = {
+        "json_schema_extra": {
+            "examples": [
+                {
+                    "name": "Foo",
+                    "description": "A very nice Item",
+                    "price": 35.4,
+                    "tax": 3.2,
+                    "tags": ["foo"],
+                    "images": [
+                        {
+                            "url": "http://example.com",
+                            "name": "Foo"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+
+
+class Offer(BaseModel):
     name: str
     description: Union[str, None] = None
     price: float
-    tax: Union[float, None] = None
+    items: list[Item]
+
 
 class User(BaseModel):
     username: str
     full_name: Union[str, None] = None
 
+
 app = FastAPI()
 
 fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+class FilterParams(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    limit: int = Field(100, gt=0, le=100)
+    offset: int = Field(0, ge=0)
+    order_by: Literal["created_at", "updated_at"] = "created_at"
+    tags: list[str] = []
+
+
+class Cookies(BaseModel):
+    session_id: str
+    fatebook_tracker: str | None = None
+    googall_tracker: str | None = None
 
 
 @app.get("/")
 async def root():
     return {"message": "Hello World"}
+
+
+@app.get("/items_cookie_model/")
+async def read_items_cookie_model(
+    cookies: Annotated[Cookies, Cookie()]
+):
+    return cookies
+
+
+@app.get("/items_cookie/")
+async def read_items_cookie(
+    ads_id: Annotated[Union[str, None], Cookie()] = None,
+    user_agent: Annotated[Union[str, None], Header()] = None
+):
+    return {"ads_id": ads_id, "User-Agent": user_agent}
+
+
+@app.post("/index-weights/")
+async def create_index_weights(weights: Dict[int, float]):
+    return weights
+
+
+@app.post("/images/multiple/")
+async def create_multiple_images(images: list[Image]):
+    return images
+
+
+@app.post("/offers/")
+async def create_offer(offer: Offer):
+    return offer
 
 
 @app.post("/items/")
@@ -41,22 +125,21 @@ async def create_item(item: Item):
 
 @app.put("/items/{item_id}")
 async def update_item(
-    item_id: int, item: Item, user: User, importance: Annotated[int, Body()]
+    item_id: int,
+    item: Annotated[
+        Item,
+        Body(
+            embed=True
+        )
+    ]
 ):
-    results = {"item_id": item_id, "item": item, "user": user, "importance": importance}
+    results = {"item_id": item_id, "item": item}
     return results
 
 
 @app.get("/items/")
-async def read_items(
-    q: Annotated[
-        Union[str, None], Query(min_length=3, max_length=50, pattern="^fixedquery$")
-    ] = None,
-):
-    results = {"items": [{"item_id": "Foo"}, {"item_id": "Bar"}]}
-    if q:
-        results.update({"q": q})
-    return results
+async def read_items(filter_query: Annotated[FilterParams, Query()]):
+    return filter_query
 
 
 @app.get("/items/{item_id}")
