@@ -11,6 +11,8 @@ services:
     platform: linux/amd64
     build:
       context: .
+      args:
+        APP_DIR: django
     volumes:
       - ./django:/app
     environment:
@@ -27,6 +29,24 @@ services:
       app_network:
         aliases:
           - backend-app.lvh.me
+
+  fastapi-app:
+    platform: linux/amd64
+    build:
+      context: .
+      args:
+        APP_DIR: fastapi
+    volumes:
+      - ./fastapi:/app
+    environment:
+      <<: *x-backend-app-environment
+    command: [ "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8001", "--reload" ]
+    ports:
+      - "8001:8001"
+    networks:
+      app_network:
+        aliases:
+          - fastapi-app.lvh.me
 
 
 networks:
