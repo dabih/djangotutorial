@@ -3,7 +3,8 @@ from typing import Any
 
 from typing_extensions import Annotated, Literal, Union, Dict, List
 
-from fastapi import Body, FastAPI, Query, Cookie, Header, Form
+from fastapi import Body, FastAPI, Query, Cookie, Header, Form, File, UploadFile
+from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, HttpUrl, EmailStr
 
 
@@ -102,8 +103,20 @@ async def login(data: Annotated[FormData, Form()]):
     return data
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def main():
+    content = """
+<body>
+<form action="/files/" enctype="multipart/form-data" method="post">
+<input name="files" type="file" multiple>
+<input type="submit">
+</form>
+<form action="/uploadfiles/" enctype="multipart/form-data" method="post">
+<input name="files" type="file" multiple>
+<input type="submit">
+</form>
+</body>
+    """
+    return HTMLResponse(content=content)
 
 
 @app.get("/items_cookie_model/")
@@ -111,6 +124,22 @@ async def read_items_cookie_model(
     cookies: Annotated[Cookies, Cookie()]
 ):
     return cookies
+
+
+@app.post("/files/")
+async def create_files(
+    files: Annotated[list[bytes], File(description="Multiple files as bytes")],
+):
+    return {"file_sizes": [len(file) for file in files]}
+
+
+@app.post("/uploadfiles/")
+async def create_upload_files(
+    files: Annotated[
+        list[UploadFile], File(description="Multiple files as UploadFile")
+    ],
+):
+    return {"filenames": [file.filename for file in files]}
 
 
 @app.get("/items_cookie/")
