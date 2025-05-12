@@ -325,6 +325,7 @@ dependencies = [
     { name = "fastapi", extra = ["standard"] },
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
+    { name = "python-multipart" },
     { name = "uvicorn" },
 ]
 
@@ -375,6 +376,7 @@ requires-dist = [
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.11,<0.116" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
+    { name = "python-multipart", specifier = ">=0.0.20" },
     { name = "uvicorn", specifier = ">=0.34.0,<0.35" },
 ]
 

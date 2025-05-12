@@ -3,7 +3,7 @@ from typing import Any
 
 from typing_extensions import Annotated, Literal, Union, Dict, List
 
-from fastapi import Body, FastAPI, Query, Cookie, Header
+from fastapi import Body, FastAPI, Query, Cookie, Header, Form
 from pydantic import BaseModel, Field, HttpUrl, EmailStr
 
 
@@ -89,6 +89,17 @@ class UserIn(BaseModel):
     email: EmailStr
     full_name: Union[str, None] = None
 
+
+class FormData(BaseModel):
+    model_config = {"extra": "forbid"}
+
+    username: str
+    password: str
+
+
+@app.post("/login/")
+async def login(data: Annotated[FormData, Form()]):
+    return data
 
 @app.get("/")
 async def root():
