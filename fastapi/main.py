@@ -1,8 +1,10 @@
 from enum import Enum
-from typing_extensions import Annotated, Literal, Union, Dict
+from typing import Any
+
+from typing_extensions import Annotated, Literal, Union, Dict, List
 
 from fastapi import Body, FastAPI, Query, Cookie, Header
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, EmailStr
 
 
 class ModelName(str, Enum):
@@ -74,9 +76,18 @@ class FilterParams(BaseModel):
 
 
 class Cookies(BaseModel):
+    model_config = {"extra": "forbid"}
+
     session_id: str
     fatebook_tracker: str | None = None
     googall_tracker: str | None = None
+
+
+class UserIn(BaseModel):
+    username: str
+    password: str
+    email: EmailStr
+    full_name: Union[str, None] = None
 
 
 @app.get("/")
@@ -115,7 +126,7 @@ async def create_offer(offer: Offer):
 
 
 @app.post("/items/")
-async def create_item(item: Item):
+async def create_item(item: Item) -> Item:
     item_dict = item.model_dump()
     if item.tax is not None:
         price_with_tax = item.price + item.tax
@@ -137,9 +148,9 @@ async def update_item(
     return results
 
 
-@app.get("/items/")
-async def read_items(filter_query: Annotated[FilterParams, Query()]):
-    return filter_query
+@app.get("/items/", response_model=list[Item])
+async def read_items() -> Any:
+    return [Item(name="Portal Gun", price=42.0)]
 
 
 @app.get("/items/{item_id}")
@@ -156,6 +167,11 @@ async def read_user_me():
 async def read_user(user_id: str):
     return {"user_id": user_id}
 
+
+# Don't do this in production!
+@app.post("/user/")
+async def create_user(user: UserIn) -> UserIn:
+    return user
 
 @app.get("/models/{model_name}")
 async def get_model(model_name: ModelName):

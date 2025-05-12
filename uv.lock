@@ -321,6 +321,7 @@ source = { editable = "." }
 dependencies = [
     { name = "django" },
     { name = "dotenv" },
+    { name = "email-validator" },
     { name = "fastapi", extra = ["standard"] },
     { name = "psycopg2-binary" },
     { name = "python-dotenv" },
@@ -370,6 +371,7 @@ dev = [
 requires-dist = [
     { name = "django", specifier = ">=5.2" },
     { name = "dotenv", specifier = ">=0.9.9" },
+    { name = "email-validator", specifier = ">=2.2.0" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.115.11,<0.116" },
     { name = "psycopg2-binary", specifier = ">=2.9.10" },
     { name = "python-dotenv", specifier = ">=1.1.0" },
