@@ -3,7 +3,8 @@ from typing import Any
 
 from typing_extensions import Annotated, Literal, Union, Dict, List
 
-from fastapi import Body, FastAPI, Query, Cookie, Header, Form, File, UploadFile
+from fastapi import (Body, FastAPI, Query, Cookie,
+                     Header, Form, File, UploadFile, HTTPException)
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, HttpUrl, EmailStr
 
@@ -227,3 +228,13 @@ async def get_model(model_name: ModelName):
 @app.get("/files/{file_path:path}")
 async def read_file(file_path: str):
     return {"file_path": file_path}
+
+
+items_except = {"foo": "The Foo Wrestlers"}
+
+
+@app.get("/ggg")
+async def read_item(item_id: str):
+    if item_id not in items_except:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"item": items_except[item_id]}
