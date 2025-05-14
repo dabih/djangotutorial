@@ -3,10 +3,11 @@ from typing import Any
 
 from typing_extensions import Annotated, Literal, Union, Dict, List
 
-from fastapi import (Body, FastAPI, Query, Cookie,
+from fastapi import (Body, FastAPI, Query, Cookie, Depends,
                      Header, Form, File, UploadFile, HTTPException)
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field, HttpUrl, EmailStr
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 
 
 class ModelName(str, Enum):
@@ -61,12 +62,46 @@ class Offer(BaseModel):
 
 class User(BaseModel):
     username: str
+    email: Union[str, None] = None
     full_name: Union[str, None] = None
+    disabled: Union[bool, None] = None
 
 
 app = FastAPI()
 
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def fake_decode_token(token):
+    return User(
+        username=token + "fakedecoded", email="john@example.com", full_name="John Doe"
+    )
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    user = fake_decode_token(token)
+    return user
+
+
 fake_items_db = [{"item_name": "Foo"}, {"item_name": "Bar"}, {"item_name": "Baz"}]
+
+fake_users_db = {
+    "johndoe": {
+        "username": "johndoe",
+        "full_name": "John Doe",
+        "email": "johndoe@example.com",
+        "hashed_password": "fakehashedsecret",
+        "disabled": False,
+    },
+    "alice": {
+        "username": "alice",
+        "full_name": "Alice Wonderson",
+        "email": "alice@example.com",
+        "hashed_password": "fakehashedsecret2",
+        "disabled": True,
+    },
+}
+
+def fake_hash_password(password: str):
+    return "fakehashed" + password
 
 class FilterParams(BaseModel):
     model_config = {"extra": "forbid"}
@@ -200,8 +235,8 @@ async def read_item(item_id: int):
 
 
 @app.get("/users/me")
-async def read_user_me():
-    return {"user_id": "the current user"}
+async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
+    return current_user
 
 
 @app.get("/users/{user_id}")
